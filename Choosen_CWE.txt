@@ -1,0 +1,7 @@
+CWE List
+Julia:
+-779: Logging of Excessive
+-778: Insufficient Logging
+-224: Obscured Security-relevant
+-223: Omission of Security-relevant Information by Alternate Name
+-117: Improper Output Neutralization for Logs
