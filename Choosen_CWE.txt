@@ -5,3 +5,10 @@ Julia:
 -224: Obscured Security-relevant
 -223: Omission of Security-relevant Information by Alternate Name
 -117: Improper Output Neutralization for Logs
+
+Dariya: Anthentication Errors
+-289: Authentication Bypass by Alternate Name
+-307: Improper Restriction of Excessive Authentication Attempts
+-308: Use of Single-factor Authentication
+-303: Incorrect Implementation of Authentication Algorithm
+-836: Use of Password Hash Instead of Password for Authentication
