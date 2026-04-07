@@ -12,3 +12,10 @@ Dariya: Anthentication Errors
 -308: Use of Single-factor Authentication
 -303: Incorrect Implementation of Authentication Algorithm
 -836: Use of Password Hash Instead of Password for Authentication
+
+Shalom: Cryptographic Issues
+-261: Weak Encoding for Password
+-324: Use of a Key Past its Expiration Date
+-328: Use of Weak Hash
+-331: Insufficient Entropy
+-347: Improper Verification of Cryptographic Signature
