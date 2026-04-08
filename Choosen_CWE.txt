@@ -19,3 +19,6 @@ Shalom: Cryptographic Issues
 -328: Use of Weak Hash
 -331: Insufficient Entropy
 -347: Improper Verification of Cryptographic Signature
+
+
+Link: https://cwe.mitre.org/data/definitions/699.html
