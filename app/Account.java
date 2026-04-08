@@ -14,7 +14,8 @@ public class Account {
     //each account is associated with one player profile (CWE-283)
     private final Player player;
     // CWE-770: limit resources
-    private static final int LOGIN_MAX = 1;
+    private static final int LOGIN_MAX = 1; 
+    private long lockoutTime = 0;
 
     public Account(String username, String password, String answerSec, Player player) {
         this.username = username;
@@ -65,16 +66,19 @@ public class Account {
 
     // CWE-640: password recovery with throttling
     public boolean passwordRecovery(String answerAttempt) {
-        //limit recovery attempts to prevent brute-force attacks (CWE-640)
+        // Increment recovery attempts and check for lockout
         if (recoveryAttempts >= 3) {
-            System.out.println("Too many recovery attempts.");
+        if (System.currentTimeMillis() - lockoutTime < 5 * 60 * 1000) {
+            System.out.println("Too many recovery attempts. Try again later.");
             return false;
         }
+        // cooldown expired, reset
+        recoveryAttempts = 0;
+        }
 
-        recoveryAttempts++;
-
-        //wrong answer to security question
         if (!answerSec.equals(answerAttempt)) {
+        recoveryAttempts++;
+            if (recoveryAttempts >= 3) lockoutTime = System.currentTimeMillis();
             System.out.println("Recovery failed.");
             return false;
         }

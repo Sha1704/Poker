@@ -6,6 +6,8 @@ public class AccountManager {
     private final Map<String, Account> accounts = new HashMap<>();
     //CWE-770: allocation of resources without limits or throttling
     private final int maxAccounts = 100; 
+    private int nextPlayerId = 1;
+
 
     //CWE-708: incorrect ownership assignment
     public boolean register(String username, String password, String answerSec, double startingChips) {
@@ -22,7 +24,7 @@ public class AccountManager {
     if (startingChips > maxChips) startingChips = maxChips;
     
     // create new player profile and account
-    Player newPlayer = new Player(accounts.size() + 1, username, startingChips);
+    Player newPlayer = new Player(nextPlayerId++, username, startingChips);
     accounts.put(username, new Account(username, password, answerSec, newPlayer));
     return true;
     }
@@ -35,7 +37,7 @@ public class AccountManager {
 
     public boolean deleteAccount(String username, String password) {
         Account acc = accounts.get(username);
-        if (acc != null && password.equals(password)) {
+        if (acc != null && acc.checkPassword(password)) {
             accounts.remove(username);
             return true;
         }
