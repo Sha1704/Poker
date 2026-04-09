@@ -13,6 +13,13 @@ Dariya: Anthentication Errors
 -303: Incorrect Implementation of Authentication Algorithm
 -836: Use of Password Hash Instead of Password for Authentication
 
+Maria: File Handling Issues
+-22: Path Traversal
+-378: Creation of Temporary File With Insecure Permissions
+-379: Creation of Temporary File in Directory With Insecure Permissions
+-426: Untrusted Search Path
+-427: Uncontrolled Search Path Element
+
 Shalom: Cryptographic Issues
 -261: Weak Encoding for Password
 -324: Use of a Key Past its Expiration Date
