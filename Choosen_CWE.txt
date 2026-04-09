@@ -19,3 +19,13 @@ Maria: File Handling Issues
 -379: Creation of Temporary File in Directory With Insecure Permissions
 -426: Untrusted Search Path
 -427: Uncontrolled Search Path Element
+
+Shalom: Cryptographic Issues
+-261: Weak Encoding for Password
+-324: Use of a Key Past its Expiration Date
+-328: Use of Weak Hash
+-331: Insufficient Entropy
+-347: Improper Verification of Cryptographic Signature
+
+
+Link: https://cwe.mitre.org/data/definitions/699.html
