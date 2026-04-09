@@ -20,5 +20,11 @@ Shalom: Cryptographic Issues
 -331: Insufficient Entropy
 -347: Improper Verification of Cryptographic Signature
 
+Carlos: Data Processing Errors
+-130: Improper Handling of Length Parameter Inconsistency
+-178: Improper Handling of Case Sensitivity
+-182: Collapse of Data into Unsafe Value
+-229: Improper Handling of Values
+-233: Improper Handling of Parameters
 
 Link: https://cwe.mitre.org/data/definitions/699.html
