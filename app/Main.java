@@ -4,6 +4,14 @@ import java.util.Scanner;
 
 public class Main {
 
+    /**
+     * Starts and runs an interactive Texas Hold'em console game session.
+     *
+     * The method prompts for the human player's name and the total number of players, initializes the deck,
+     * dealer, one human player and the specified number of bot players, then enters a hand loop that
+     * drives dealing, player and bot actions, showdowns, and chip accounting until the human is out of chips
+     * or the user chooses to stop. All input and game progress are performed via standard input/output.
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -128,6 +136,18 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Prompt the human player for an in-game poker action and return the selected action.
+     *
+     * The method prints the human's hole cards, chips, current pot and (when applicable) the amount
+     * required to call, then repeatedly reads input until a valid action is entered. It accepts
+     * common aliases for actions and enforces that "check" is only allowed when there is nothing to call.
+     *
+     * @param scanner the Scanner to read player input from
+     * @param dealer  the Dealer used to obtain pot and bet information
+     * @param human   the human Player whose hand and chip information are displayed
+     * @return        the chosen Player.PokerAction: `FOLD`, `CHECK`, `CALL`, `RAISE`, or `ALL_IN`
+     */
     private static Player.PokerAction getPlayerAction(Scanner scanner, Dealer dealer, Player human) {
         double toCall = dealer.getCurrentBetToMatch() - human.getCurrentBet();
         boolean canCheck = toCall == 0;
@@ -172,6 +192,16 @@ public class Main {
         }
     }
 
+    /**
+     * Prompt the user for a raise amount and return it clamped between the dealer's minimum and maximum allowed raise.
+     *
+     * Reads a line from {@code scanner}, parses it as a double, and constrains the result to the range
+     * [minRaise, maxRaise] computed from {@code dealer}. If parsing fails, {@code minRaise} is returned.
+     *
+     * @param scanner source of user input
+     * @param dealer  provides the minimum raise and current-player chip/state used to compute the maximum
+     * @return the chosen raise amount constrained to the dealer's allowed range; returns `minRaise` on invalid input
+     */
     private static double getRaiseAmount(Scanner scanner, Dealer dealer) {
         double minRaise = dealer.getMinRaise();
         double maxRaise = dealer.getCurrentPlayer().getChips()
@@ -187,6 +217,17 @@ public class Main {
         }
     }
 
+    /**
+     * Chooses a bot player's poker action using simple probability-based heuristics.
+     *
+     * When the bot can check, it chooses CHECK with ~70% probability and RAISE otherwise.
+     * When the bot must call (cannot check), it chooses CALL with ~80% probability,
+     * RAISE with ~30% probability (evaluated after the CALL check), and FOLD otherwise.
+     *
+     * @param dealer the current game dealer providing pot and bet information
+     * @param bot the bot player for whom the action is being selected
+     * @return the selected {@code Player.PokerAction} for the bot
+     */
     private static Player.PokerAction getBotAction(Dealer dealer, Player bot) {
         double toCall = dealer.getCurrentBetToMatch() - bot.getCurrentBet();
         boolean canCheck = toCall == 0;
@@ -205,6 +246,12 @@ public class Main {
         }
     }
 
+    /**
+     * Prints the dealer's current game state, community cards, pot, and, when applicable, which player is to act.
+     *
+     * @param dealer the Dealer whose state and table information will be displayed
+     * @param human the local human Player; used to determine and highlight when it is the human's turn
+     */
     private static void printGameState(Dealer dealer, Player human) {
         System.out.println("\n--- " + dealer.getGameState() + " ---");
         System.out.println("Community cards: " + dealer.getCommunityCards());
