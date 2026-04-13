@@ -88,8 +88,4 @@ public enum HandRank {
         }
         return freq;
     }
-
-    public int compareTo(HandRank other) {
-        return this.ordinal() - other.ordinal();
-    }
 }
