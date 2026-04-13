@@ -26,15 +26,13 @@ public final class PokerLogger {
         try {
             LOGGER.setUseParentHandlers(false);
 
-            Handler console = new ConsoleHandler();
-            console.setFormatter(new SimpleFormatter());
-            console.setLevel(Level.INFO);
+
 
             Handler file = new FileHandler("audit.log", 5_000_000, 5, true);
             file.setFormatter(new SimpleFormatter());
             file.setLevel(Level.ALL);
 
-            LOGGER.addHandler(console);
+         
             LOGGER.addHandler(file);
             LOGGER.setLevel(Level.ALL);
 
@@ -43,9 +41,7 @@ public final class PokerLogger {
         }
     }
 
-    // ----------------------------------------------------------------------
     //  CWE‑117: Neutralize untrusted data before logging
-    // ----------------------------------------------------------------------
     private static String sanitize(String input) {
         if (input == null) return "[null]";
 
@@ -59,8 +55,10 @@ public final class PokerLogger {
     }
 
     // ----------------------------------------------------------------------
-    //  CWE‑223 / CWE‑778: Ensure security‑relevant info is logged
+    //  CWE‑223: The inputted strings do not have security-relevant info
+    //  CWE‑778: Ensure security‑relevant info is logged
     //  CWE‑224: Do not obscure important details
+    //  *for 223 it matters what are input. 
     // ----------------------------------------------------------------------
     public static void logSecurityEvent(String eventType, String username, String details) {
         String msg = String.format(
@@ -75,9 +73,7 @@ public final class PokerLogger {
 
     }
 
-    // ----------------------------------------------------------------------
-    //  CWE‑779: Avoid logging excessive or sensitive data
-    // ----------------------------------------------------------------------
+   
     public static void logError(String message, Throwable t) {
         // Only log high‑level error info, not full stack traces or sensitive data
         String sanitizedMessage = sanitize(message);
@@ -107,6 +103,7 @@ public final class PokerLogger {
         if (input.length() <= maxLength) return input;
         return input.substring(0, maxLength) + "...[truncated]";
     }
+
     // Depuplication logic to prevent log flooding (CWE‑779)
     private static synchronized void logWithDedup(Level level, String message) {
         long now = System.currentTimeMillis();
