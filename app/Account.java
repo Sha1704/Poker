@@ -27,10 +27,11 @@ public class Account {
         this.player = player;
     }
 
-    public void setPassword(String newPassword) {
-    if (newPassword == null || newPassword.isBlank()) return;
-        this.password = newPassword;
-    }
+    public boolean setPassword(String newPassword) {
+    if (newPassword == null || newPassword.isBlank()) return false;
+    this.password = newPassword;
+    return true;
+}
 
     // CWE-837: enforce single unique action
     public boolean login(String passwordAttempt) {

@@ -65,12 +65,14 @@ public class AccountManager {
     }
 
     public boolean recoverPassword(String username, String answerSec, String newPassword) {
-        if (username == null || answerSec == null || newPassword == null) return false;
-        Account acc = accounts.get(username.toLowerCase());    
-        if (acc != null && acc.passwordRecovery(answerSec)) {
-        acc.setPassword(newPassword);
-        return true;
+    if (username == null || answerSec == null || newPassword == null || newPassword.isBlank()) return false;
+
+    Account acc = accounts.get(username.toLowerCase());
+
+    if (acc != null && acc.passwordRecovery(answerSec)) {
+        return acc.setPassword(newPassword);
     }
+
     return false;
     }
 
