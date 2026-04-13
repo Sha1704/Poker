@@ -2,7 +2,7 @@ package app;
 
 public class Account {
     private final String username;
-    private final String password;
+    private String password;
     //security question answer for password recovery
     private final String answerSec;
     //tracks if user is currently logged in to prevent multiple sessions (CWE-837)
@@ -25,6 +25,11 @@ public class Account {
         this.recoveryAttempts = 0;
         this.loginCount = 0;
         this.player = player;
+    }
+
+    public void setPassword(String newPassword) {
+    if (newPassword == null || newPassword.isBlank()) return;
+        this.password = newPassword;
     }
 
     // CWE-837: enforce single unique action
