@@ -138,13 +138,18 @@ public class Authentication {
      * Method to register a new user 
      * 
      * @param username user's username
-     * @param password user's password
+     * @param password user's password (must be at least 8 characters)
      * @param answer security question answer
      * @return true if register successfully, false otherwise
      * @throws Exception if fail to operate file or hashing
      */
     public boolean register(String username, String password, String answer) throws Exception{
         username = clean(username);
+        // simple validate password
+        if(password == null || password.isBlank() || password.length() < 8){
+            System.out.println("Password must be at least 8 characters.");
+            return false;
+        }
         if(findUser(username)!=null){
             System.out.println("Username already taken!");
             return false;
@@ -186,9 +191,11 @@ public class Authentication {
         }
         String salt = user[1];
         // hash what user typed and then compare (CWE-836 & CWE-303)
-        boolean passwordCorrect = hash(password, salt).equals(user[2]);
+        boolean passwordCorrect = MessageDigest.isEqual(
+            hash(password, salt).getBytes(StandardCharsets.UTF_8), user[2].getBytes(StandardCharsets.UTF_8));
         // CWE-308: Use of Single-factor Authentication
-        boolean answerCorrect = hash(clean(answer), salt).equals(user[3]);
+        boolean answerCorrect = MessageDigest.isEqual(
+            hash(clean(answer), salt).getBytes(StandardCharsets.UTF_8), user[3].getBytes(StandardCharsets.UTF_8));
         if(!passwordCorrect||!answerCorrect){
             int failed = Integer.parseInt(user[4]) + 1;
             user[4] = String.valueOf(failed);
