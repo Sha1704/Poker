@@ -16,7 +16,7 @@ Dariya: Anthentication Errors
 Maria: File Handling Issues
 -22: Path Traversal
 -378: Creation of Temporary File With Insecure Permissions
--379: Creation of Temporary File in Directory With Insecure Permissions
+-379: Creation of Temporary File in Directory  my With Insecure Permissions
 -426: Untrusted Search Path
 -427: Uncontrolled Search Path Element
 

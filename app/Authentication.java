@@ -3,6 +3,12 @@ import java.io.*;
 import java.util.*;
 import java.security.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.Paths;
 
 /**
  * Implementation to authenticate the account
@@ -11,6 +17,11 @@ import java.nio.charset.StandardCharsets;
 public class Authentication {
     private static final int MAX_ATTEMPTS = 3;
     public static final String QUESTION = "What was the name of your first stuffed animal?";
+    /**
+     * CWE-22: Improper Limitation of a Pathname to a Restricted Directory (Path Traversal)
+     * Using a hardcoded filename instead of user input to avoid an attacker 
+     * being able to influence the file path. 
+     */
     private static final String FILE = "user.txt";
 
     /** 
@@ -217,5 +228,63 @@ public class Authentication {
         saveUser(username, user);
         System.out.println("Login successfully! Welcome back, " + username);
         return true;
+    }
+
+    /**
+     * Securely create a temporary file. 
+     * @param prefix file name prefix
+     * @return temporary file
+     * @throws IOException if creations fails
+     */
+    private File createTemp(String prefix) throws IOException
+    {
+        Path tempFile = Files.createTempFile(prefix, ".tmp");
+        File file = tempFile.toFile();
+
+        //Preventing insecure permissions(CWE-378) and insecure directory(CWE-379)
+        //by explicitly setting the file permissions. 
+        if(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"))
+        {
+            java.nio.file.Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rw-------"));
+        }
+        else
+        {
+            file.setReadable(true,true);
+            file.setWritable(true, true);
+            file.setExecutable(false);
+        }
+
+        tempFile.deleteOnExit();
+        return file;
+    }
+
+    private String getLibraryExtension() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) return ".dll";
+        if (os.contains("mac")) return ".dylib";
+        return ".so"; // Linux
+    }
+    /**
+     * Securely loading a native library 
+     * @param libName the library name
+     */
+    private void loadSecureLibrary(String libName)
+    {
+        //Using an absolute path instead of a search path prevents CWE-426(untrusted search path)
+        //and CWE-427(uncontrolled search path element).
+        String basePath = "usr/local/lib";
+        String fullPath = basePath + libName + getLibraryExtension();
+        Path libPath = Paths.get(absolutePath).normalize();
+        if(!libPath.startsWith(basePath))
+        {
+            throw new SecurityException("Invalid library path");
+        }
+        if(!Files.exists(libPath))
+        {
+            throw new RuntimeException("Library not found: " + libPath);
+        }
+
+        System.load(libPath.toString());
+
     }
 }
