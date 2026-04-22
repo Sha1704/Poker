@@ -1,6 +1,6 @@
 package app;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -130,6 +130,7 @@ public class Main {
 
             if (fundedPlayers < 2) {
                 System.out.println("\nOnly one player has chips remaining. Game over.");
+                break;
             }
 
             if (human.getChips() <= 0) {
@@ -138,7 +139,7 @@ public class Main {
             }
 
             System.out.print("\nPlay another hand? (y/n): ");
-            String response = scanner.nextLine().trim().toLowerCase(); //CWE-178
+            String response = scanner.nextLine().trim().toLowerCase(Locale.ROOT); //CWE-178
             if (!response.equals("y") && !response.equals("yes")) {
                 keepPlaying = false;
             }
@@ -175,31 +176,28 @@ public class Main {
 
         while (true) {
             System.out.print("Action (fold/check/call/raise/all-in): ");
-            String input = scanner.nextLine().trim().toLowerCase(); //CWE-178
+            String input = scanner.nextLine().trim().toLowerCase(Locale.ROOT); //CWE-178
 
             switch (input) {
-                case "fold":
-                case "f":
+                case "fold", "f" -> {
                     return Player.PokerAction.FOLD;
-                case "check":
-                case "x":
+                }
+                case "check", "x" -> {
                     if (canCheck) { //CWE-233
                         return Player.PokerAction.CHECK;
                     }
                     System.out.println("Cannot check, there is a bet to call.");
-                    break;
-                case "call":
-                case "c":
+                }
+                case "call", "c" -> {
                     return Player.PokerAction.CALL;
-                case "raise":
-                case "r":
+                }
+                case "raise", "r" -> {
                     return Player.PokerAction.RAISE;
-                case "all-in":
-                case "allin":
-                case "ai":
+                }
+                case "all-in", "allin", "ai" -> {
                     return Player.PokerAction.ALL_IN;
-                default:
-                    System.out.println("Invalid input. Try again.");
+                }
+                default -> System.out.println("Invalid input. Try again.");
             }
         }
     }
