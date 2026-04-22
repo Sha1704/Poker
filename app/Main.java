@@ -120,6 +120,18 @@ public class Main {
                 System.out.println(p.getName() + ": " + p.getChips() + " chips");
             }
 
+            dealer.getAllPlayers().stream()
+                .filter(p -> p != human && p.getChips() <= 0)
+                .forEach(dealer::removePlayer);
+
+            long fundedPlayers = dealer.getAllPlayers().stream()
+                .filter(p -> p.getChips() > 0)
+                .count();
+
+            if (fundedPlayers < 2) {
+                System.out.println("\nOnly one player has chips remaining. Game over.");
+            }
+
             if (human.getChips() <= 0) {
                 System.out.println("\nYou're out of chips! Game over.");
                 break;
