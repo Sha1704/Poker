@@ -14,14 +14,20 @@ public class Main {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        AccountManager manager = new AccountManager();
+
+        // NEW: separate sign‑in method
+        Account loggedIn = authenticateUser(scanner, manager);
+
+        if (loggedIn == null) {
+            System.out.println("Goodbye.");
+            scanner.close();
+            return;
+        }
 
         System.out.println("=== Texas Hold'em Poker ===\n");
 
-        System.out.print("Enter your name: ");
-        String playerName = scanner.nextLine().trim();
-        if (playerName.isEmpty()) {
-            playerName = "Player";
-        }
+        System.out.print("Welcome, " + loggedIn.getUsername() + "!\n");
 
         System.out.print("Enter number of players (2-6): ");
         int numPlayers = 2; //CWE-182
@@ -29,13 +35,14 @@ public class Main {
             numPlayers = Integer.parseInt(scanner.nextLine().trim());
             numPlayers = Math.max(2, Math.min(6, numPlayers)); //CWE-229
         } catch (NumberFormatException e) {
+            PokerLogger.logError("Failed to parse number of players ", e);
             numPlayers = 2;
         }
 
         Deck deck = new Deck();
         Dealer dealer = new Dealer(deck);
 
-        Player human = new Player(0, playerName, 1000.0);
+        Player human = new Player(0, loggedIn.getUsername(), 1000.0);
         dealer.addPlayer(human);
 
         for (int i = 1; i < numPlayers; i++) {
@@ -144,7 +151,8 @@ public class Main {
                 keepPlaying = false;
             }
         }
-
+        loggedIn.logout(); // Ensure logout on exit
+    
         System.out.println("\nThanks for playing!");
         scanner.close();
     }
@@ -276,4 +284,90 @@ public class Main {
             }
         }
     }
+   /**
+     * Authenticates a user by prompting for login credentials.
+     *
+     * @param scanner source of user input
+     * @param manager the account manager for handling authentication logic
+     * @return the authenticated account or null if authentication fails
+     */
+    private static Account authenticateUser(Scanner scanner, AccountManager manager) {
+
+        Account loggedIn = null;
+
+        System.out.println("=== Poker Account System ===");
+
+        while (loggedIn == null) {
+            System.out.println("\n1. Login");
+            System.out.println("2. Register");
+            System.out.print("> ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+
+                case "1": {
+                    System.out.print("Username: ");
+                    String u = scanner.nextLine();
+
+                    System.out.print("Password: ");
+                    String p = scanner.nextLine();
+
+                    System.out.print("Security answer: ");
+                    String a = scanner.nextLine();
+
+                    loggedIn = manager.login(u, p,a);
+
+                    if (loggedIn == null) {
+                        System.out.println("Login failed.");
+                    } else {
+                        System.out.println("Login successful. Welcome, " + loggedIn.getUsername());
+                    }
+                    break;
+                }
+
+                case "2": {
+                    System.out.print("Choose username: ");
+                    String u = scanner.nextLine();
+
+                    System.out.print("Choose password: ");
+                    String p = scanner.nextLine();
+
+                    System.out.print("Security answer: ");
+                    String a = scanner.nextLine();
+
+                    System.out.print("Starting chips: ");
+                    double chips = safeDouble(scanner.nextLine());
+
+                    boolean ok = manager.register(u, p, a, chips);
+                    System.out.println(ok ? "Registration successful." : "Registration failed.");
+                    break;
+                }
+
+                case "3":
+                    return null;
+
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+
+        return loggedIn;
+    }
+
+/**
+ * Safely parses a double from a string, returning NaN on failure.
+ * @param input the string to parse
+ * @return the parsed double or NaN if parsing fails
+ */
+    private static double safeDouble(String input) {
+        try {
+            return Double.parseDouble(input.trim());
+        } catch (Exception e) {
+            PokerLogger.logError("Failed to parse double from input " , e);
+            return Double.NaN;
+        }
+    
+    }   
 }
+
