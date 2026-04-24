@@ -34,4 +34,13 @@ Carlos: Data Processing Errors
 -229: Improper Handling of Values
 -233: Improper Handling of Parameters
 
+Azul: Business Logic Errors
+-283: Unverified Ownership
+-708: Incorrect Ownership Assignment
+-770: Allocation of Resources Without Limits or Throttling
+-640: Weak Password Recovery Mechanism for Forgotten Password 
+-837: Improper Enforcement of a Single, Unique Action 
+
+
+
 Link: https://cwe.mitre.org/data/definitions/699.html
