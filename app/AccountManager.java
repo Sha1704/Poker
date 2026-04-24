@@ -59,6 +59,7 @@ public class AccountManager {
             accounts.put(key, new Account(username, player));
         }
     } catch (IOException e) {
+        PokerLogger.logError("Error loading accounts: ",e);
         System.out.println("Error: could not load accounts " + e.getMessage());
     }
 }
@@ -106,6 +107,7 @@ public class AccountManager {
         try {
             if (!auth.register(username, password, answerSec)) return false;
         } catch (Exception e) {
+            PokerLogger.logError("Error during registration: ", e);
             return false;
         }
 
@@ -135,6 +137,7 @@ public class AccountManager {
         try {
             if (!auth.login(username, password, answer)) return null;
         } catch (Exception e) {
+            PokerLogger.logError("Error during login: ", e);
             return null;
         }
 
@@ -177,6 +180,7 @@ public class AccountManager {
         try {
             if (!auth.login(username, password, answer)) return false;
         } catch (Exception e) {
+            PokerLogger.logError("Error during account deletion: ", e);
             return false;
         }
 

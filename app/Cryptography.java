@@ -52,22 +52,27 @@ public class Cryptography {
             return encode(encrypted);
         } 
         catch (NoSuchAlgorithmException e) {
+            PokerLogger.logError("No Such Algorithm Exception: " , e);
             System.err.println("No Such Algorithm Exception: " + e.getMessage());
             return null;
         }
         catch (NoSuchPaddingException e) {
+            PokerLogger.logError("No Such Padding Exception: " , e);
             System.err.println("No Such Padding Exception: " + e.getMessage());
             return null;
         }
         catch (InvalidKeyException e) {
+            PokerLogger.logError("Invalid Key Exception: " , e);
             System.err.println("Invalid Key Exception: " + e.getMessage());
             return null;
         }
         catch (IllegalBlockSizeException e) {
+            PokerLogger.logError("Illegal Block Size Exception: " , e);
             System.err.println("Illegal Block Size Exception: " + e.getMessage());
             return null;
         }
         catch (BadPaddingException e) {
+            PokerLogger.logError("Bad Padding Exception: " , e);
             System.err.println("Bad Padding Exception: " + e.getMessage());
             return null;
         }
@@ -98,22 +103,27 @@ public class Cryptography {
             return new String(decrypted, StandardCharsets.UTF_8);
         } 
         catch (NoSuchAlgorithmException e) {
+            PokerLogger.logError("No Such Algorithm Exception: " , e);
             System.err.println("No Such Algorithm Exception: " + e.getMessage());
             return null;
         }
         catch (NoSuchPaddingException e) {
+            PokerLogger.logError("No Such Padding Exception: " , e);
             System.err.println("No Such Padding Exception: " + e.getMessage());
             return null;
         }
         catch (InvalidKeyException e) {
+            PokerLogger.logError("Invalid Key Exception: " , e);
             System.err.println("Invalid Key Exception: " + e.getMessage());
             return null;
         }
         catch (IllegalBlockSizeException e) {
+            PokerLogger.logError("Illegal Block Size Exception: " , e);
             System.err.println("Illegal Block Size Exception: " + e.getMessage());
             return null;
         }
         catch (BadPaddingException e) {
+            PokerLogger.logError("Bad Padding Exception: " , e);
             System.err.println("Bad Padding Exception: " + e.getMessage());
             return null;
         }
@@ -176,10 +186,12 @@ public class Cryptography {
             return bytesToHex(digest.digest());
         } 
         catch (NoSuchAlgorithmException e) {
-            System.err.println("No Such Algorithm Exception: " + e.getMessage());
+            PokerLogger.logError("No Such Algorithm Exception: " , e);
+             System.err.println("No Such Algorithm Exception: " + e.getMessage());
             return null;
         }
         catch (IOException e) {
+            PokerLogger.logError("IO Exception: " , e);
             System.err.println("IO Exception: " + e.getMessage());
             return null;
         }
@@ -239,14 +251,17 @@ public class Cryptography {
             return signature.sign();
         } 
         catch (NoSuchAlgorithmException e) {
+            PokerLogger.logError("No Such Algorithm Exception: " , e);
             System.err.println("No Such Algorithm Exception: " + e.getMessage());
             return null;
         }
         catch (SignatureException e) {
+            PokerLogger.logError("Signature Exception: " , e);
             System.err.println("Signature Exception: " + e.getMessage());
             return null;
         }
         catch (InvalidKeyException e) {
+            PokerLogger.logError("Invalid Key Exception: " , e);
             System.err.println("Invalid Key Exception: " + e.getMessage());
             return null;
         }
@@ -272,14 +287,17 @@ public class Cryptography {
             return signature.verify(signatureBytes);
         } 
         catch (NoSuchAlgorithmException e) {
+            PokerLogger.logError("No Such Algorithm Exception: " , e);
             System.err.println("No Such Algorithm Exception: " + e.getMessage());
             return false;
         }
         catch (SignatureException e) {
+            PokerLogger.logError("Signature Exception: " , e);
             System.err.println("Signature Exception: " + e.getMessage());
             return false;
         }
         catch (InvalidKeyException e) {
+            PokerLogger.logError("Invalid Key Exception: " , e);
             System.err.println("Invalid Key Exception: " + e.getMessage());
             return false;
         }

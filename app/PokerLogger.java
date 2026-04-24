@@ -2,7 +2,10 @@ package app;
 
 import java.time.Instant;
 import java.util.logging.*;
-
+/**
+ * Implement a secure logger for the poker application that adheres to best practices for logging security-relevant events.
+ * @author Julia
+ */
 public final class PokerLogger {
 
     private static final Logger LOGGER = Logger.getLogger(PokerLogger.class.getName());
@@ -21,6 +24,7 @@ public final class PokerLogger {
 
     /**
      * Configure logger with safe defaults.
+     * @
      */
     private static void configure() {
         try {
@@ -58,7 +62,7 @@ public final class PokerLogger {
     //  CWE‑223: The inputted strings do not have security-relevant info
     //  CWE‑778: Ensure security‑relevant info is logged
     //  CWE‑224: Do not obscure important details
-    //  *for 223 it matters what are input. 
+    //  
     // ----------------------------------------------------------------------
     public static void logSecurityEvent(String eventType, String username, String details) {
         String msg = String.format(
@@ -129,6 +133,7 @@ public final class PokerLogger {
         repeatCount = 0;
         lastLogTime = now;
     }
+
 
 
 }

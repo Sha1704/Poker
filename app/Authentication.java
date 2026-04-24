@@ -5,7 +5,7 @@ import java.security.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.Files;
+import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.Paths;
@@ -51,18 +51,24 @@ public class Authentication {
      * @return hexadecimal string of hashed value
      * @throws NoSuchAlgorithmException if SHA-256 is unavailable
      */
-    private String hash(String value, String salt) throws NoSuchAlgorithmException{
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        // combine salt with value and convert to bytes
-        String saltVal = salt + value;
-        byte[] hashedBytes = md.digest(saltVal.getBytes(StandardCharsets.UTF_8));
-        // convert bytes to string
-        StringBuilder hexResult = new StringBuilder();
-        for(byte hashByte : hashedBytes){
-            String hexadecimal = String.format("%02x", hashByte);
-            hexResult.append(hexadecimal);
+    private String hash(String value, String salt){
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            // combine salt with value and convert to bytes
+            String saltVal = salt + value;
+            byte[] hashedBytes = md.digest(saltVal.getBytes(StandardCharsets.UTF_8));
+            // convert bytes to string
+            StringBuilder hexResult = new StringBuilder();
+            for(byte hashByte : hashedBytes){
+                String hexadecimal = String.format("%02x", hashByte);
+                hexResult.append(hexadecimal);
+            }
+            return hexResult.toString();
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("SHA-256 algorithm not found: " + e.getMessage());
+            PokerLogger.logError("Hashing failed in hash method ", e);
+            throw new RuntimeException("Hashing failed", e);
         }
-        return hexResult.toString();
     }
 
     /**
@@ -91,7 +97,7 @@ public class Authentication {
      * @return user data array if found, null otherwise
      * @throws IOException if fail to read file
      */
-    private String[] findUser(String username) throws IOException{
+    private String[] findUser(String username) {
         File userFile = new File(FILE);
         if(!userFile.exists()) {
             return null;
@@ -107,6 +113,10 @@ public class Authentication {
                 }
             }
         }
+        catch(IOException e){
+            System.err.println("Error reading user file: " + e.getMessage());
+            PokerLogger.logError("File operation failed in findUser()", e);
+        }
         // no matching user found
         return null;
     }
@@ -118,7 +128,7 @@ public class Authentication {
      * @param updatedUser updated user data fields
      * @throws IOException if fail to run the file
      */
-    private void saveUser(String username, String[] updatedUser) throws IOException{
+    private void saveUser(String username, String[] updatedUser) {
         File userFile = new File(FILE);
         List<String> lines = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(userFile))){
@@ -136,12 +146,21 @@ public class Authentication {
                 }
             }
         }
+        catch(IOException e){
+            System.err.println("Error reading user file: " + e.getMessage());
+                PokerLogger.logError("File operation failed in saveUser()", e);
+            return;
+        }
         // write updated data back to file
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(userFile, false))){
             for(String currLine : lines){
                 bw.write(currLine);
                 bw.newLine();
             }
+        }
+        catch(IOException e){
+            System.err.println("Error writing user file: " + e.getMessage());
+            PokerLogger.logError("File operation failed in saveUser()", e);
         }
     }
 
@@ -158,10 +177,20 @@ public class Authentication {
         username = clean(username);
         // simple validate password
         if(password == null || password.isBlank() || password.length() < 8){
+            PokerLogger.logSecurityEvent(
+                "REGISTER_FAIL",
+                username,
+                "reason=weak_password"
+            );
             System.out.println("Password must be at least 8 characters.");
             return false;
         }
         if(findUser(username)!=null){
+            PokerLogger.logSecurityEvent(
+                "REGISTER_FAIL",
+                username,
+                "reason=username_taken"
+            );
             System.out.println("Username already taken!");
             return false;
         }
@@ -175,6 +204,11 @@ public class Authentication {
             bw.newLine();
         }
         System.out.println("Account created successfully!");
+        PokerLogger.logSecurityEvent(
+            "REGISTER_SUCCESS",
+            username,
+            "account_created=true"
+        );
         return true;
     }
 
@@ -192,11 +226,13 @@ public class Authentication {
         String[] user = findUser(username);
         if(user == null){
             System.out.println("User could not be found");
+            PokerLogger.logAuthFailure(username, "unknown");
             return false;
         }
         // CWE-307: Improper Restriction of Excessive Authentication Attempts
         // locked account after 3 attempts 
         if(user[5].equals("true")){
+            PokerLogger.logAuthFailure(username, "account_locked");
             System.out.println("Account is locked after too many failed attempts.");
             return false;
         }
@@ -209,11 +245,13 @@ public class Authentication {
             hash(clean(answer), salt).getBytes(StandardCharsets.UTF_8), user[3].getBytes(StandardCharsets.UTF_8));
         if(!passwordCorrect||!answerCorrect){
             int failed = Integer.parseInt(user[4]) + 1;
+            PokerLogger.logAuthFailure(username,"invalid_credentials");// CWE-223: Don't tell the limit of allow tries and only when it fails 
             user[4] = String.valueOf(failed);
             // CWE-307
             boolean isLocked = failed >= MAX_ATTEMPTS;
             if(isLocked){
                 user[5] = "true";
+
             } else {
                 user[5] = "false";
             }
@@ -227,6 +265,12 @@ public class Authentication {
         user[5] = "false";
         saveUser(username, user);
         System.out.println("Login successfully! Welcome back, " + username);
+        PokerLogger.logSecurityEvent(
+            "LOGIN_SUCCESS",
+            username,
+            "Account was successfully authenticated"
+        );
+
         return true;
     }
 
@@ -254,7 +298,7 @@ public class Authentication {
             file.setExecutable(false);
         }
 
-        tempFile.deleteOnExit();
+        file.deleteOnExit();// check this later
         return file;
     }
 
@@ -274,13 +318,19 @@ public class Authentication {
         //and CWE-427(uncontrolled search path element).
         String basePath = "usr/local/lib";
         String fullPath = basePath + libName + getLibraryExtension();
-        Path libPath = Paths.get(absolutePath).normalize();
+        Path libPath = Paths.get(fullPath).normalize();// check this later
         if(!libPath.startsWith(basePath))
         {
+            if (!libPath.startsWith(basePath)) {
+                PokerLogger.logError("Invalid library path attempted: ", null);
+                throw new SecurityException("Invalid library path");
+            }
+
             throw new SecurityException("Invalid library path");
         }
         if(!Files.exists(libPath))
         {
+            PokerLogger.logError("Library not found: " , null);
             throw new RuntimeException("Library not found: " + libPath);
         }
 
