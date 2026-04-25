@@ -1,0 +1,8 @@
+Apr 24, 2026 9:18:04 PM app.PokerLogger logWithDedup
+INFO: time=2026-04-25T02:18:04.428999Z | event=AUTH_FAILURE | user=k | details=sourceIp=unknown
+Apr 24, 2026 9:18:18 PM app.PokerLogger logWithDedup
+INFO: time=2026-04-25T02:18:18.915798Z | event=REGISTER_FAIL | user=maria | details=reason=weak_password
+Apr 24, 2026 9:18:34 PM app.PokerLogger logWithDedup
+INFO: time=2026-04-25T02:18:34.443924Z | event=REGISTER_SUCCESS | user=maria | details=account_created=true
+Apr 24, 2026 9:18:45 PM app.PokerLogger logWithDedup
+INFO: time=2026-04-25T02:18:45.257564Z | event=LOGIN_SUCCESS | user=maria | details=Account was successfully authenticated
