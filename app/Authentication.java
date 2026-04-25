@@ -273,31 +273,43 @@ public class Authentication {
 
         return true;
     }
-
+    //Preventing insecure permissions(CWE-378) and insecure directory(CWE-379)
+    //by explicitly setting the file permissions.
     /**
-     * Securely create a temporary file. 
-     * @param prefix file name prefix
-     * @return temporary file
-     * @throws IOException if creations fails
+     * Method to create a temporary file with secure permissions
+     * @param prefix
+     * @return the created temporary file
+     * @throws IOException
      */
-    private File createTemp(String prefix) throws IOException
-    {
-        Path tempFile = Files.createTempFile(prefix, ".tmp");
-        File file = tempFile.toFile();
-
-        //Preventing insecure permissions(CWE-378) and insecure directory(CWE-379)
-        //by explicitly setting the file permissions. 
-        if(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"))
-        {
-            java.nio.file.Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rw-------"));
+    private File createTemp(String prefix) throws IOException {
+        // 1. Create a secure temp directory (only owner can access)
+        Path tempDir = Files.createTempDirectory("secure_");
+        
+        // Set directory permissions to rwx------ (owner only)
+        if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+            Files.setPosixFilePermissions(tempDir, 
+                PosixFilePermissions.fromString("rwx------"));
+        } else {
+            // Windows: restrict to owner as much as possible
+            tempDir.toFile().setReadable(true, true);
+            tempDir.toFile().setWritable(true, true);
+            tempDir.toFile().setExecutable(true, true);
         }
-        else
-        {
-            file.setReadable(true,true);
+        
+        //Create the temp file INSIDE that secure directory
+        Path tempFile = Files.createTempFile(tempDir, prefix, ".tmp");
+        File file = tempFile.toFile();
+        
+        //Set restrictive file permissions 
+        if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+            Files.setPosixFilePermissions(tempFile, 
+                PosixFilePermissions.fromString("rw-------"));
+        } else {
+            file.setReadable(true, true);
             file.setWritable(true, true);
             file.setExecutable(false);
         }
-
+        
         file.deleteOnExit();
         return file;
     }
