@@ -32,7 +32,6 @@ public class Player {
     public void fold() { folded = true; }
     public void allIn() { allIn = true; }
     public void resetForNewRound() {
-        hand = null;
         currentBet = 0;
         folded = false;
         allIn = false;
