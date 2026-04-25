@@ -42,7 +42,7 @@ public class Main {
         Deck deck = new Deck();
         Dealer dealer = new Dealer(deck);
 
-        Player human = new Player(0, loggedIn.getUsername(), 1000.0);
+        Player human = loggedIn.getPlayer();
         dealer.addPlayer(human);
 
         for (int i = 1; i < numPlayers; i++) {
