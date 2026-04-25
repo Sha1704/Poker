@@ -298,7 +298,7 @@ public class Authentication {
             file.setExecutable(false);
         }
 
-        file.deleteOnExit();// check this later
+        file.deleteOnExit();
         return file;
     }
 
@@ -318,7 +318,7 @@ public class Authentication {
         //and CWE-427(uncontrolled search path element).
         String basePath = "usr/local/lib";
         String fullPath = basePath + libName + getLibraryExtension();
-        Path libPath = Paths.get(fullPath).normalize();// check this later
+        Path libPath = Paths.get(fullPath).normalize();
         if(!libPath.startsWith(basePath))
         {
             if (!libPath.startsWith(basePath)) {
